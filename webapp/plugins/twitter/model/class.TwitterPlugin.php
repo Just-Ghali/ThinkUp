@@ -164,9 +164,8 @@ class TwitterPlugin extends Plugin implements CrawlerPlugin, DashboardPlugin, Po
                 $twitter_crawler->fetchUnloadedFollowerDetails();
                 $twitter_crawler->cleanUpFollows();
                 $twitter_crawler->fetchFriendTweetsAndFriends();
-                $twitter_crawler->generateInsights(3);
 
-                $insights_generator->generateInsights();
+                $insights_generator->generateInsights(3);
 
                 if ($noauth) {
                     // No auth req'd
