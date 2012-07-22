@@ -1,9 +1,9 @@
 <?php
 /**
  *
- * ThinkUp/webapp/api/v1/post.php
+ * ThinkUp/webapp/plugins/insightsgenerator/model/class.InsightPluginParent.php
  *
- * Copyright (c) 2009-2012 Gina Trapani, Sam Rose
+ * Copyright (c) 2012 Gina Trapani
  *
  * LICENSE:
  *
@@ -20,13 +20,24 @@
  * You should have received a copy of the GNU General Public License along with ThinkUp.  If not, see
  * <http://www.gnu.org/licenses/>.
  *
- *
- * @author Sam Rose <samwho@lbak.co.uk>
  * @license http://www.gnu.org/licenses/gpl.html
- * @copyright 2009-2012 Gina Trapani, Sam Rose
+ * @copyright 2012 Gina Trapani
+ * @author Gina Trapani <ginatrapani [at] gmail [dot] com>
  */
-chdir("../../");
-require_once 'init.php';
+class InsightPluginParent {
+    public function generateInsight(Instance $instance, $last_week_of_posts, $number_days) {
+        $this->logger = Logger::getInstance();
+        $this->logger->setUsername($instance->network_username);
+        $this->insight_date = new DateTime();
+        $this->insight_date = $this->insight_date->format('Y-m-d');
+    }
 
-$controller = new PostAPIController();
-echo $controller->go();
+    public function renderConfiguration($owner) {
+    }
+
+    public function activate() {
+    }
+
+    public function deactivate() {
+    }
+}
