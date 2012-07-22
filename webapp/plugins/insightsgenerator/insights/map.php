@@ -35,11 +35,10 @@ class MapInsight extends InsightPluginParent implements InsightPlugin {
         parent::generateInsight($instance, $last_week_of_posts, $number_days);
         $this->logger->logInfo("Begin generating insight", __METHOD__.','.__LINE__);
 
-        $plugin_option_dao = DAOFactory::getDAO('PluginOptionDAO');
         $insight_dao = DAOFactory::getDAO('InsightDAO');
 
-        $simplified_post_date = "";
         foreach ($last_week_of_posts as $post) {
+            $simplified_post_date = date('Y-m-d', strtotime($post->pub_date));
             // Map insight: If not a reply or retweet and geoencoded, show the map in the stream
             if (!isset($post->in_reply_to_user_id) && !isset($post->in_reply_to_post_id)
             && !isset($post->in_retweet_of_post_id) && $post->reply_count_cache > 5) {

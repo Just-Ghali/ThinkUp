@@ -39,37 +39,28 @@ class InterestingFollowersInsight extends InsightPluginParent implements Insight
 
         // Least likely followers insights
         $follow_dao = DAOFactory::getDAO('FollowDAO');
-        $days_ago = 0;
-        while ($days_ago < $number_days) {
-            //For each of the past 7 days (remove this later & just do day by day?)
-            //get least likely followers for that day
-            $least_likely_followers = $follow_dao->getLeastLikelyFollowersByDay($instance->network_user_id,
-            $instance->network, $days_ago, 3);
-            if (sizeof($least_likely_followers) > 0 ) { //if not null, store insight
-                //If followers have more followers than half of what the instance has, jack up emphasis
-                $emphasis = Insight::EMPHASIS_LOW;
-                foreach ($least_likely_followers as $least_likely_follower) {
-                    if ($least_likely_follower->follower_count > ($this->user->follower_count/2)) {
-                        $emphasis = Insight::EMPHASIS_HIGH;
-                    }
-                }
 
-                $insight_date = new DateTime();
-                //Not PHP 5.2 compatible
-                //$insight_date->sub(new DateInterval('P'.$days_ago.'D'));
-                $insight_date->modify('-'.$days_ago.' day');
-                $insight_date = $insight_date->format('Y-m-d');
-                if (sizeof($least_likely_followers) > 1) {
-                    $insight_dao->insertInsight('least_likely_followers', $instance->id, $insight_date,
-                    "Good people:", sizeof($least_likely_followers)." interesting users followed you.",
-                    $emphasis, serialize($least_likely_followers));
-                } else {
-                    $insight_dao->insertInsight('least_likely_followers', $instance->id, $insight_date,
-                    "Hey!", "An interesting user followed you.",
-                    $emphasis, serialize($least_likely_followers));
+        $least_likely_followers = $follow_dao->getLeastLikelyFollowersByDay($instance->network_user_id,
+        $instance->network, 0, 3);
+        if (sizeof($least_likely_followers) > 0 ) { //if not null, store insight
+            //If followers have more followers than half of what the instance has, jack up emphasis
+            $emphasis = Insight::EMPHASIS_LOW;
+            foreach ($least_likely_followers as $least_likely_follower) {
+                if ($least_likely_follower->follower_count > ($this->user->follower_count/2)) {
+                    $emphasis = Insight::EMPHASIS_HIGH;
                 }
             }
-            $days_ago++;
+
+            $insight_date = new DateTime();
+            $insight_date = $insight_date->format('Y-m-d');
+            if (sizeof($least_likely_followers) > 1) {
+                $insight_dao->insertInsight('least_likely_followers', $instance->id, $insight_date,
+                "Good people:", sizeof($least_likely_followers)." interesting users followed you.",
+                $emphasis, serialize($least_likely_followers));
+            } else {
+                $insight_dao->insertInsight('least_likely_followers', $instance->id, $insight_date,
+                "Hey!", "An interesting user followed you.", $emphasis, serialize($least_likely_followers));
+            }
         }
         $this->logger->logInfo("Done generating insight", __METHOD__.','.__LINE__);
     }

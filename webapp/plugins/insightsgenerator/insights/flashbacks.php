@@ -37,34 +37,25 @@ class FlashbackInsight extends InsightPluginParent implements InsightPlugin {
 
         $insight_dao = DAOFactory::getDAO('InsightDAO');
         $post_dao = DAOFactory::getDAO('PostDAO');
-        // Flashback posts
-        $days_ago = $number_days;
-        while ($days_ago > -1) {
-            $insight_date = new DateTime();
-            $insight_date->modify('-'.$days_ago.' day');
-            $insight_day_of_week = (int) $insight_date->format('w');
-            $this->logger->logInfo("Insight day of week is ".$insight_day_of_week, __METHOD__.','
-            .__LINE__);
-            $insight_date_formatted = $insight_date->format('Y-m-d');
 
-            $existing_insight = $insight_dao->getInsight("posts_on_this_day_flashback", $instance->id,
-            $insight_date_formatted);
-            if (!isset($existing_insight)) {
-                //Generate flashback post list
-                $flashback_posts = $post_dao->getOnThisDayFlashbackPosts($instance->network_user_id,
-                $instance->network, $insight_date_formatted);
-                if (isset($flashback_posts) && sizeof($flashback_posts) > 0 ) {
-                    $oldest_post_year = date(date( 'Y' , strtotime($flashback_posts[0]->pub_date)));
-                    $current_year = date('Y');
-                    $number_of_years_ago = $current_year - $oldest_post_year;
-                    $plural = ($number_of_years_ago > 1 )?'s':'';
-                    $insight_dao->insertInsight("posts_on_this_day_flashback", $instance->id,
-                    $insight_date_formatted, $oldest_post_year." flashback:", $number_of_years_ago." year".
-                    $plural. " ago today, you posted: ", Insight::EMPHASIS_MED, serialize($flashback_posts));
-                }
+        $insight_date = new DateTime();
+        $insight_date_formatted = $insight_date->format('Y-m-d');
+
+        $existing_insight = $insight_dao->getInsight("posts_on_this_day_flashback", $instance->id,
+        $insight_date_formatted);
+        if (!isset($existing_insight)) {
+            //Generate flashback post list
+            $flashback_posts = $post_dao->getOnThisDayFlashbackPosts($instance->network_user_id,
+            $instance->network, $insight_date_formatted);
+            if (isset($flashback_posts) && sizeof($flashback_posts) > 0 ) {
+                $oldest_post_year = date(date( 'Y' , strtotime($flashback_posts[0]->pub_date)));
+                $current_year = date('Y');
+                $number_of_years_ago = $current_year - $oldest_post_year;
+                $plural = ($number_of_years_ago > 1 )?'s':'';
+                $insight_dao->insertInsight("posts_on_this_day_flashback", $instance->id,
+                $insight_date_formatted, $oldest_post_year." flashback:", $number_of_years_ago." year".
+                $plural. " ago today, you posted: ", Insight::EMPHASIS_MED, serialize($flashback_posts));
             }
-
-            $days_ago--;
         }
         $this->logger->logInfo("Done generating insight", __METHOD__.','.__LINE__);
     }

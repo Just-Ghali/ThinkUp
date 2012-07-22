@@ -34,16 +34,15 @@ class WordFrequencyInsight extends InsightPluginParent implements InsightPlugin 
     public function generateInsight(Instance $instance, $last_week_of_posts, $number_days) {
         parent::generateInsight($instance, $last_week_of_posts, $number_days);
 
-        $insight_baseline_dao = DAOFactory::getDAO('InsightBaselineDAO');
         $insight_dao = DAOFactory::getDAO('InsightDAO');
 
-        $simplified_post_date = "";
         foreach ($last_week_of_posts as $post) {
             // Frequent word insight: If > 20 replies, let user know most-frequently mentioned words are available
-            if ($post->reply_count_cache >= 20) {
+            if ($post->reply_count_cache >= 20 && $post->network != 'google+') {
                 if (!isset($config)) {
                     $config = Config::getInstance();
                 }
+                $simplified_post_date = date('Y-m-d', strtotime($post->pub_date));
                 $insight_dao->insertInsight('replies_frequent_words_'.$post->id, $instance->id,
                 $simplified_post_date, "Reply spike!",
                'Your post got '.$post->reply_count_cache.' replies. See <a href="'.$config->getValue('site_root_path').
