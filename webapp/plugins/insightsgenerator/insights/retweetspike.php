@@ -37,7 +37,6 @@ class RetweetSpikeInsight extends InsightPluginParent implements InsightPlugin {
         $this->logger->logInfo("Begin generating insight", __METHOD__.','.__LINE__);
 
         $insight_baseline_dao = DAOFactory::getDAO('InsightBaselineDAO');
-        $insight_dao = DAOFactory::getDAO('InsightDAO');
 
         $simplified_post_date = "";
         foreach ($last_week_of_posts as $post) {
@@ -70,69 +69,69 @@ class RetweetSpikeInsight extends InsightPluginParent implements InsightPlugin {
             // Next compare post retweet counts to baselines and store insights where there's a spike or high
             if (isset($high_retweet_count_365_days->value)
             && $post->all_retweets >= $high_retweet_count_365_days->value) {
-                $insight_dao->insertInsight('retweet_high_365_day_'.$post->id, $instance->id,
+                $this->insight_dao->insertInsight('retweet_high_365_day_'.$post->id, $instance->id,
                 $simplified_post_date, "New 365-day high!", $post->all_retweets." people reshared your post.",
                 Insight::EMPHASIS_HIGH, serialize($post));
 
-                $insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
             } elseif (isset($high_retweet_count_30_days->value)
             && $post->all_retweets >= $high_retweet_count_30_days->value) {
-                $insight_dao->insertInsight('retweet_high_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->insertInsight('retweet_high_30_day_'.$post->id, $instance->id,
                 $simplified_post_date, "New 30-day high!", $post->all_retweets." people reshared your post.",
                 Insight::EMPHASIS_HIGH, serialize($post));
 
-                $insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
             } elseif (isset($high_retweet_count_7_days->value)
             && $post->all_retweets >= $high_retweet_count_7_days->value) {
-                $insight_dao->insertInsight('retweet_high_7_day_'.$post->id, $instance->id, $simplified_post_date,
+                $this->insight_dao->insertInsight('retweet_high_7_day_'.$post->id, $instance->id, $simplified_post_date,
                 "New 7-day high!", $post->all_retweets." people reshared your post.",
                 Insight::EMPHASIS_HIGH, serialize($post));
 
-                $insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
             } elseif (isset($average_retweet_count_30_days->value)
             && $post->all_retweets > ($average_retweet_count_30_days->value*2)) {
                 $multiplier = floor($post->all_retweets/$average_retweet_count_30_days->value);
-                $insight_dao->insertInsight('retweet_spike_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->insertInsight('retweet_spike_30_day_'.$post->id, $instance->id,
                 $simplified_post_date, $retweet_term." spike!", $post->all_retweets.
                 " people reshared your post, more than ".$multiplier. "x your 30-day average.", Insight::EMPHASIS_LOW,
                 serialize($post));
 
-                $insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
             } elseif (isset($average_retweet_count_7_days->value)
             && $post->all_retweets > ($average_retweet_count_7_days->value*2)) {
                 $multiplier = floor($post->all_retweets/$average_retweet_count_7_days->value);
-                $insight_dao->insertInsight('retweet_spike_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->insertInsight('retweet_spike_7_day_'.$post->id, $instance->id,
                 $simplified_post_date, $retweet_term." spike!", $post->all_retweets.
                 " people reshared your post, more than " .$multiplier. "x your 7-day average.",
                 Insight::EMPHASIS_LOW, serialize($post));
 
-                $insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_high_7_day_'.$post->id, $instance->id,
                 $simplified_post_date);
-                $insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
+                $this->insight_dao->deleteInsight('retweet_spike_30_day_'.$post->id, $instance->id,
                 $simplified_post_date);
             }
         }

@@ -30,6 +30,7 @@ class InsightPluginParent {
         $this->logger->setUsername($instance->network_username);
         $this->insight_date = new DateTime();
         $this->insight_date = $this->insight_date->format('Y-m-d');
+        $this->insight_dao = DAOFactory::getDAO('InsightDAO');
     }
 
     public function renderConfiguration($owner) {

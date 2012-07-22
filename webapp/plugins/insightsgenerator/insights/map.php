@@ -35,8 +35,6 @@ class MapInsight extends InsightPluginParent implements InsightPlugin {
         parent::generateInsight($instance, $last_week_of_posts, $number_days);
         $this->logger->logInfo("Begin generating insight", __METHOD__.','.__LINE__);
 
-        $insight_dao = DAOFactory::getDAO('InsightDAO');
-
         foreach ($last_week_of_posts as $post) {
             $simplified_post_date = date('Y-m-d', strtotime($post->pub_date));
             // Map insight: If not a reply or retweet and geoencoded, show the map in the stream
@@ -45,7 +43,7 @@ class MapInsight extends InsightPluginParent implements InsightPlugin {
                 $plugin_option_dao = DAOFactory::GetDAO('PluginOptionDAO');
                 $options = $plugin_option_dao->getOptionsHash('geoencoder', true);
                 if (isset($options['gmaps_api_key']->option_value) && $post->is_geo_encoded == 1) {
-                    $insight_dao->insertInsight('geoencoded_replies', $instance->id, $simplified_post_date,
+                    $this->insight_dao->insertInsight('geoencoded_replies', $instance->id, $simplified_post_date,
                    "Going global!", "Your post got replies and retweets from locations all over the map.",
                     Insight::EMPHASIS_LOW, serialize($post));
                 }

@@ -34,18 +34,12 @@ class ListMembershipInsight extends InsightPluginParent implements InsightPlugin
 
     public function generateInsight(Instance $instance, $last_week_of_posts, $number_days) {
         parent::generateInsight($instance, $last_week_of_posts, $number_days);
-        $this->logger->logUserInfo("Start", __METHOD__.','.__LINE__);
+        $this->logger->logUserInfo("Begin generating insight", __METHOD__.','.__LINE__);
 
-        $insight_dao = DAOFactory::getDAO('InsightDAO');
-
-        // List membership insights
-        $group_membership_dao = DAOFactory::getDAO('GroupMemberDAO');
-        $insight_date = new DateTime();
-        $insight_date = $insight_date->format('Y-m-d');
-        $this->logger->logInfo("Getting new group memberships for ".$insight_date, __METHOD__.',' .__LINE__);
         //get new group memberships per day
+        $group_membership_dao = DAOFactory::getDAO('GroupMemberDAO');
         $new_groups = $group_membership_dao->getNewMembershipsByDate($instance->network, $instance->network_user_id,
-        $insight_date);
+        $this->insight_date);
         if (sizeof($new_groups) > 0 ) { //if not null, store insight
             $group_membership_count_dao = DAOFactory::getDAO('GroupMembershipCountDAO');
             $list_membership_count_history_by_day = $group_membership_count_dao->getHistory(
@@ -63,13 +57,13 @@ class ListMembershipInsight extends InsightPluginParent implements InsightPlugin
                     $group->setMetadata();
                     $group_name_list .= '<a href="'.$group->url.'">'.$group->keyword.'</a>';
                 }
-                $insight_dao->insertInsight('new_group_memberships', $instance->id, $insight_date,
+                $this->insight_dao->insertInsight('new_group_memberships', $instance->id, $this->insight_date,
                 "Filed:", "You got added to ".sizeof($new_groups)." lists: ".$group_name_list.
                 ", bringing your total to ".number_format(end($list_membership_count_history_by_day['history'])).
                 ".", Insight::EMPHASIS_LOW, serialize($list_membership_count_history_by_day));
             } else {
                 $new_groups[0]->setMetadata();
-                $insight_dao->insertInsight('new_group_memberships', $instance->id, $insight_date, "Filed:",
+                $this->insight_dao->insertInsight('new_group_memberships', $instance->id, $this->insight_date, "Filed:",
                 "You got added to a new list, ".'<a href="'.$new_groups[0]->url.'">'.$new_groups[0]->keyword.
                 "</a>, bringing your total to <strong>".
                 number_format(end($list_membership_count_history_by_day['history'])).
